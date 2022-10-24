@@ -23,4 +23,4 @@ EOF
 		;;
 esac
 
-bash
+${ENTRY_EXIT_COMMAND}
