@@ -20,6 +20,9 @@ while [ $# -gt 0 ]; do
     --entry-exit-command=*)
       ENTRY_EXIT_COMMAND="${1#*=}"
       ;;
+    --apt-cache-host=*)
+      CACHE_HOST="${1#*=}"
+      ;;
     *)
       usage
   esac
@@ -46,5 +49,6 @@ docker container attach ${BUILD_TARGET} || \
  -e "BUILD_TARGET=${BUILD_TARGET}" \
  -e "LOCAL_DEB_MIRROR=${LOCAL_DEB_MIRROR}" \
  -e "ENTRY_EXIT_COMMAND=${ENTRY_EXIT_COMMAND}" \
+ -e "CACHE_HOST=${CACHE_HOST}" \
  -it debian:${BUILD_TARGET} \
  "entrypoint.sh"
