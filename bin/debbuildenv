@@ -34,11 +34,12 @@ BUILD_TARGET="${BUILD_TARGET:-unstable}"
 ENTRY_EXIT_COMMAND="${ENTRY_EXIT_COMMAND:-bash}"
 
 SCRIPT_NAME="$(basename ${0})"
-BUILD_DIR="/srv/${SCRIPT_NAME}/${BUILD_TARGET}/build"
-LOCAL_DIR="/srv/${SCRIPT_NAME}/${BUILD_TARGET}/local/bin"
+BUILD_HOME="/srv/${SCRIPT_NAME}/build/${BUILD_TARGET}"
+BUILD_DIR="${BUILD_HOME}/build"
+LOCAL_DIR="${BUILD_HOME}/local/bin"
 USER_HOME_DIR="/root"
 
-[[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p /srv/${SCRIPT_NAME}/${BUILD_TARGET}/local && ln -s /srv/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
+[[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p ${BUILD_HOME}/local && ln -s /srv/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
 [ -f ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
 
 docker container attach ${BUILD_TARGET} || \
