@@ -43,11 +43,11 @@ else
 fi
 
 SCRIPT_NAME="$(basename ${0})"
-BUILD_HOME="/srv/${SCRIPT_NAME}/build/${BUILD_TARGET}"
+BUILD_HOME="${BASE_DIR:-/srv}/${SCRIPT_NAME}/build/${BUILD_TARGET}"
 BUILD_DIR="${BUILD_HOME}/build"
 LOCAL_DIR="${BUILD_HOME}/local/bin"
 
-[[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p ${BUILD_HOME}/local && ln -s /srv/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
+[[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p ${BUILD_HOME}/local && ln -s ${BASE_DIR:-/srv}/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
 [ -f ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
 
 docker container attach ${BUILD_TARGET} 2>/dev/null || \
