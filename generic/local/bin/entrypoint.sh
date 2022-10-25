@@ -2,7 +2,7 @@
 
 [ -n "${LOCAL_DEB_MIRROR}" ] && sed -i "s#http://deb.debian.org/debian #${LOCAL_DEB_MIRROR}/debian #g" /etc/apt/sources.list;  \
 [ -n "${CACHE_HOST}" ] && echo "Acquire::http::Proxy \"http://${CACHE_HOST}:3142\";" > /etc/apt/apt.conf.d/01proxy; \
-[ "${BUILD_USER}" != "root" ] && adduser -shell /bin/bash --gecos '' --disabled-password --home ${USER_HOME_DIR} ${BUILD_USER} > /dev/null; \
+[ "${BUILD_USER}" != "root" ] && adduser -shell /bin/bash --gecos '' --disabled-password --home ${USER_HOME_DIR} ${BUILD_USER} > /dev/null && sed -i "s/# auth       sufficient pam_wheel.so trust/auth       sufficient pam_wheel.so trust group=${BUILD_USER}/" /etc/pam.d/su; \
 echo 'Aptitude::Recommends-Important "False";' > /etc/apt/apt.conf.d/10norecommands && \
 apt-get update > /dev/null && apt-get -y upgrade > /dev/null && \
 apt-get install -y --no-install-recommends curl ca-certificates gnupg > /dev/null && \
