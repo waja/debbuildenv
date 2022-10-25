@@ -1,0 +1,86 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+
+jobs:
+  codespell:
+    name: codespell
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Codespell
+        uses: codespell-project/actions-codespell@master
+        with:
+          skip: .git
+          check_filenames: true
+          check_hidden: true
+  super-linter:
+    name: super-linter
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Lint Code Base
+        uses: github/super-linter@v4.9.7
+        env:
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  shiftleft:
+    name: shiftleft
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Perform ShiftLeft Scan
+        uses: ShiftLeftSecurity/scan-action@master
+        env:
+          WORKSPACE: ""
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCAN_AUTO_BUILD: true
+        with:
+          output: reports
+          # Scan auto-detects the languages in your project. To override uncomment the below variable and set the type
+          # type: credscan,java
+          # type: python
+      - name: Upload report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: reports
+  linux:
+    needs:
+      - codespell
+      - super-linter
+      - shiftleft
+    runs-on: ubuntu-latest
+    name: Running tests on "${{ matrix.target }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {"target": "unstable", "mirror": "http://http.debian.net", "user": "user1", "command": "bash"}
+    steps:
+      - name: Git clone repository
+        uses: actions/checkout@v2
+      - name: Run the tests on "${{ matrix.target }}"
+        env:
+          BASE_DIR: "/tmp"
+        run: |
+          mkdir -p "${BASE_DIR}"/debbuildenv && \
+          ln -s "${PWD}/generic" "${BASE_DIR}/debbuildenv/" && \
+          ln -s "${PWD}/bin" "${BASE_DIR}/debbuildenv/" && \
+          echo "Starting container" && \
+          bash -x bin/debbuildenv --target="${{ matrix.target }}" --mirror="${{ matrix.mirror }}" --build-user="${{ matrix.user }}" --entry-exit-command="${{ matrix.command }}" # --apt-cache-host="127.0.0.1" && \
+          ls -la "${BASE_DIR}/debbuildenv/build/${{ matrix.target }}/local/bin/entrypoint.sh" "${BASE_DIR}/debbuildenv/build/${{ matrix.target }}/build/"
+          # || { echo "Essential directories missing, seems like the build is failed"; exit 1 }
+          docker container prune -f
+          docker volume prune -f
