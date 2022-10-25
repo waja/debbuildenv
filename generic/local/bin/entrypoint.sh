@@ -23,6 +23,11 @@ deb-src http://ftp.cyconet.org/debian ${BUILD_TARGET}     main non-free contrib
 EOF
 			apt-get update > /dev/null
 			;;
+		unstable|sid)
+			sed "s/ deb/ deb-src/g" /etc/apt/sources.list.d/debian.sources > /etc/apt/sources.list.d/debian-src.sources && \
+			apt-get update > /dev/null && \
+			apt-get install -y --no-install-recommends git-buildpackage > /dev/null
+			;;
 		*)
 			;;
 	esac
