@@ -50,6 +50,13 @@ LOCAL_DIR="${BUILD_HOME}/local/bin"
 [[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p ${BUILD_HOME}/local && ln -s ${BASE_DIR:-/srv}/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
 [ -f ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
 
+DOCKER_RUN_OPTIONS="-i --rm"
+
+# Only allocate tty if we detect one
+if [ -t 0 ] && [ -t 1 ]; then
+    DOCKER_RUN_OPTIONS="${DOCKER_RUN_OPTIONS} -t"
+fi
+
 docker container attach ${BUILD_TARGET} 2>/dev/null || \
  ( docker start ${BUILD_TARGET} 2>/dev/null && docker container attach ${BUILD_TARGET} ) || \
  docker run -h ${BUILD_TARGET} --name ${BUILD_TARGET} \
@@ -62,5 +69,6 @@ docker container attach ${BUILD_TARGET} 2>/dev/null || \
  -e "CACHE_HOST=${CACHE_HOST}" \
  -e "BUILD_USER=${BUILD_USER}" \
  -e "USER_HOME_DIR=${USER_HOME_DIR}" \
- -it debian:${BUILD_TARGET} \
+ ${DOCKER_RUN_OPTIONS} \
+ debian:${BUILD_TARGET} \
  "entrypoint.sh"
