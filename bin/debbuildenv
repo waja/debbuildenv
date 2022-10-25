@@ -50,8 +50,8 @@ LOCAL_DIR="${BUILD_HOME}/local/bin"
 [[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p ${BUILD_HOME}/local && ln -s /srv/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
 [ -f ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
 
-docker container attach ${BUILD_TARGET} || \
- ( docker start ${BUILD_TARGET} && docker container attach ${BUILD_TARGET} ) || \
+docker container attach ${BUILD_TARGET} 2>/dev/null || \
+ ( docker start ${BUILD_TARGET} 2>/dev/null && docker container attach ${BUILD_TARGET} ) || \
  docker run -h ${BUILD_TARGET} --name ${BUILD_TARGET} \
  -v "${BUILD_DIR}":"${USER_HOME_DIR}" \
  -v "${LOCAL_DIR}":"/usr/local/bin" \
