@@ -23,6 +23,9 @@ while [ $# -gt 0 ]; do
     --apt-cache-host=*)
       CACHE_HOST="${1#*=}"
       ;;
+    --build-user=*)
+      BUILD_USER="${1#*=}"
+      ;;
     *)
       usage
   esac
@@ -32,12 +35,17 @@ done
 LOCAL_DEB_MIRROR="${LOCAL_DEB_MIRROR:-http://deb.debian.org}"
 BUILD_TARGET="${BUILD_TARGET:-unstable}"
 ENTRY_EXIT_COMMAND="${ENTRY_EXIT_COMMAND:-bash}"
+BUILD_USER="${BUILD_USER:-root}"
+if [[ ( "${BUILD_USER}" != "root" ) || ( -z "${BUILD_USER}" ) ]]; then
+       USER_HOME_DIR="/home/${BUILD_USER}"
+else
+       USER_HOME_DIR="/root"
+fi
 
 SCRIPT_NAME="$(basename ${0})"
 BUILD_HOME="/srv/${SCRIPT_NAME}/build/${BUILD_TARGET}"
 BUILD_DIR="${BUILD_HOME}/build"
 LOCAL_DIR="${BUILD_HOME}/local/bin"
-USER_HOME_DIR="/root"
 
 [[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p ${BUILD_HOME}/local && ln -s /srv/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
 [ -f ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
@@ -47,9 +55,12 @@ docker container attach ${BUILD_TARGET} || \
  docker run -h ${BUILD_TARGET} --name ${BUILD_TARGET} \
  -v "${BUILD_DIR}":"${USER_HOME_DIR}" \
  -v "${LOCAL_DIR}":"/usr/local/bin" \
+ --workdir "${USER_HOME_DIR}" \
  -e "BUILD_TARGET=${BUILD_TARGET}" \
  -e "LOCAL_DEB_MIRROR=${LOCAL_DEB_MIRROR}" \
  -e "ENTRY_EXIT_COMMAND=${ENTRY_EXIT_COMMAND}" \
  -e "CACHE_HOST=${CACHE_HOST}" \
+ -e "BUILD_USER=${BUILD_USER}" \
+ -e "USER_HOME_DIR=${USER_HOME_DIR}" \
  -it debian:${BUILD_TARGET} \
  "entrypoint.sh"
