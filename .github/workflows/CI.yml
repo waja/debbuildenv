@@ -68,6 +68,9 @@ jobs:
       matrix:
         include:
           - {"target": "unstable", "mirror": "http://http.debian.net", "user": "user1", "command": "bash"}
+          - {"target": "testing-backports", "mirror": "http://deb.debian.net", "user": "user4", "command": "sh"}
+          - {"target": "bullseye-backports", "mirror": "http://deb.debian.net", "user": "root", "command": "bash"}
+          - {"target": "buster-backports", "mirror": "http://deb.debian.net", "user": "foobar", "command": "bash"}
     steps:
       - name: Git clone repository
         uses: actions/checkout@v2
