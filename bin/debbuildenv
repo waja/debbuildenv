@@ -42,13 +42,13 @@ else
        USER_HOME_DIR="/root"
 fi
 
-SCRIPT_NAME="$(basename ${0})"
+SCRIPT_NAME="$(basename "${0}")"
 BUILD_HOME="${BASE_DIR:-/srv}/${SCRIPT_NAME}/build/${BUILD_TARGET}"
 BUILD_DIR="${BUILD_HOME}/build"
 LOCAL_DIR="${BUILD_HOME}/local/bin"
 
-[[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p ${BUILD_HOME}/local && ln -s ${BASE_DIR:-/srv}/${SCRIPT_NAME}/generic/local/bin ${LOCAL_DIR}
-[ -f ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
+[[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p "${BUILD_HOME}/local" && ln -s "${BASE_DIR:-/srv}/${SCRIPT_NAME}/generic/local/bin" "${LOCAL_DIR}"
+[ -f "${BUILD_DIR}" ] || mkdir -p "${BUILD_DIR}"
 
 DOCKER_RUN_OPTIONS="-i --rm"
 
@@ -57,9 +57,10 @@ if [ -t 0 ] && [ -t 1 ]; then
     DOCKER_RUN_OPTIONS="${DOCKER_RUN_OPTIONS} -t"
 fi
 
-docker container attach ${BUILD_TARGET} 2>/dev/null || \
- ( docker start ${BUILD_TARGET} 2>/dev/null && docker container attach ${BUILD_TARGET} ) || \
- docker run -h ${BUILD_TARGET} --name ${BUILD_TARGET} \
+# shellcheck disable=SC2086
+docker container attach "${BUILD_TARGET}" 2>/dev/null || \
+ ( docker start "${BUILD_TARGET}" 2>/dev/null && docker container attach "${BUILD_TARGET}" ) || \
+ docker run -h "${BUILD_TARGET}" --name "${BUILD_TARGET}" \
  -v "${BUILD_DIR}":"${USER_HOME_DIR}" \
  -v "${LOCAL_DIR}":"/usr/local/bin" \
  --workdir "${USER_HOME_DIR}" \
@@ -70,5 +71,5 @@ docker container attach ${BUILD_TARGET} 2>/dev/null || \
  -e "BUILD_USER=${BUILD_USER}" \
  -e "USER_HOME_DIR=${USER_HOME_DIR}" \
  ${DOCKER_RUN_OPTIONS} \
- debian:${BUILD_TARGET} \
+ debian:"${BUILD_TARGET}" \
  "entrypoint.sh"
