@@ -62,15 +62,20 @@ jobs:
       - super-linter
       - shiftleft
     runs-on: ubuntu-latest
+    services:
+      apt-cacher-ng:
+        image: mbentley/apt-cacher-ng
+        ports:
+          - 3142
     name: Running tests on "${{ matrix.target }}"
     strategy:
       fail-fast: false
       matrix:
         include:
-          - {"target": "unstable", "mirror": "http://http.debian.net", "user": "user1", "command": "bash"}
-          - {"target": "testing-backports", "mirror": "http://deb.debian.net", "user": "user4", "command": "sh"}
-          - {"target": "bullseye-backports", "mirror": "http://deb.debian.net", "user": "root", "command": "bash"}
-          - {"target": "buster-backports", "mirror": "http://deb.debian.net", "user": "foobar", "command": "bash"}
+          - {"target": "unstable", "mirror": "http://http.debian.net", "user": "user1", "command": "bash", "cacher": "apt-cacher-ng"}
+          - {"target": "testing-backports", "mirror": "http://deb.debian.net", "user": "user4", "command": "sh", "cacher": ""}
+          - {"target": "bullseye-backports", "mirror": "http://deb.debian.net", "user": "root", "command": "bash", "cacher": "apt-cacher-ng"}
+          - {"target": "buster-backports", "mirror": "http://deb.debian.net", "user": "foobar", "command": "bash", "cacher": "apt-cacher-ng"}
     steps:
       - name: Git clone repository
         uses: actions/checkout@v2
@@ -82,7 +87,7 @@ jobs:
           ln -s "${PWD}/generic" "${BASE_DIR}/debbuildenv/" && \
           ln -s "${PWD}/bin" "${BASE_DIR}/debbuildenv/" && \
           echo "Starting container" && \
-          bash -x bin/debbuildenv --target="${{ matrix.target }}" --mirror="${{ matrix.mirror }}" --build-user="${{ matrix.user }}" --entry-exit-command="${{ matrix.command }}" # --apt-cache-host="127.0.0.1" && \
+          bash -x bin/debbuildenv --target="${{ matrix.target }}" --mirror="${{ matrix.mirror }}" --build-user="${{ matrix.user }}" --entry-exit-command="${{ matrix.command }}" --apt-cache-host="${{ matrix.cacher }}" && \
           ls -la "${BASE_DIR}/debbuildenv/build/${{ matrix.target }}/local/bin/entrypoint.sh" "${BASE_DIR}/debbuildenv/build/${{ matrix.target }}/build/"
           # || { echo "Essential directories missing, seems like the build is failed"; exit 1 }
           docker container prune -f
