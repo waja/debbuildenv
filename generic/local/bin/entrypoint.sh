@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 if [ ! -f /.initialized ]; then
 	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list ] && sed -i "s#http://deb.debian.org/debian #${LOCAL_DEB_MIRROR}/debian #g" /etc/apt/sources.list;  \
 	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list.d/debian.sources ] && sed -i "s#http://deb.debian.org/debian#${LOCAL_DEB_MIRROR}/debian#g" /etc/apt/sources.list.d/debian.sources;  \
@@ -16,8 +18,13 @@ EOF
 	apt-get update > /dev/null && apt-get install debian-cyconet-archive-keyring > /dev/null
 
 	case ${BUILD_TARGET} in
+		bullseye-backports)
+			cat << EOF > /etc/apt/sources.list.d/testing.list
+deb-src http://ftp.de.debian.org/debian/ testing main contrib non-free
+EOF
+			;& #fallthru
 		*-backports)
-	cat << EOF > /etc/apt/sources.list.d/"${BUILD_TARGET}"-cyconet.list
+			cat << EOF > /etc/apt/sources.list.d/"${BUILD_TARGET}"-cyconet.list
 deb     http://ftp.cyconet.org/debian ${BUILD_TARGET}     main non-free contrib
 deb-src http://ftp.cyconet.org/debian ${BUILD_TARGET}     main non-free contrib
 EOF
