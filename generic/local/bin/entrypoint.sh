@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 if [ ! -f /.initialized ]; then
 	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list ] && sed -i "s#http://deb.debian.org/debian #${LOCAL_DEB_MIRROR}/debian #g" /etc/apt/sources.list;  \
 	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list.d/debian.sources ] && sed -i "s#http://deb.debian.org/debian#${LOCAL_DEB_MIRROR}/debian#g" /etc/apt/sources.list.d/debian.sources;  \
