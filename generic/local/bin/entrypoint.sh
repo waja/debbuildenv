@@ -4,10 +4,10 @@ if [ ! -f /.initialized ]; then
 	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list ] && sed -i "s#http://deb.debian.org/debian #${LOCAL_DEB_MIRROR}/debian #g" /etc/apt/sources.list;  \
 	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list.d/debian.sources ] && sed -i "s#http://deb.debian.org/debian#${LOCAL_DEB_MIRROR}/debian#g" /etc/apt/sources.list.d/debian.sources;  \
 	[ -n "${CACHE_HOST}" ] && echo "Acquire::http::Proxy \"http://${CACHE_HOST}:3142\";" > /etc/apt/apt.conf.d/01proxy; \
-	[ "${BUILD_USER}" != "root" ] && adduser -shell /bin/bash --gecos '' --disabled-password --home "${USER_HOME_DIR}" "${BUILD_USER}" > /dev/null && sed -i "s/# auth       sufficient pam_wheel.so trust/auth       sufficient pam_wheel.so trust group=${BUILD_USER}/" /etc/pam.d/su; \
 	printf "APT::Install-Recommends \"false\";\nAptitude::Recommends-Important \"False\";" >	/etc/apt/apt.conf.d/00InstallRecommends && \
 	apt-get update > /dev/null && apt-get -y upgrade > /dev/null && \
-	apt-get install -y --no-install-recommends curl ca-certificates gnupg > /dev/null && \
+	apt-get install -y --no-install-recommends curl ca-certificates gnupg adduser > /dev/null && \
+	[ "${BUILD_USER}" != "root" ] && adduser -shell /bin/bash --gecos '' --disabled-password --home "${USER_HOME_DIR}" "${BUILD_USER}" > /dev/null && sed -i "s/# auth       sufficient pam_wheel.so trust/auth       sufficient pam_wheel.so trust group=${BUILD_USER}/" /etc/pam.d/su; \
 	curl -fsSL https://ftp.cyconet.org/debian/repo.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/debian-cyconet-archive-keyring.gpg > /dev/null 2>&1 && \
 	cat << EOF > /etc/apt/sources.list.d/restricted-cyconet.list
 deb     [signed-by=/etc/apt/trusted.gpg.d/debian-cyconet-archive-keyring.gpg] http://ftp.cyconet.org/debian restricted     main non-free contrib
