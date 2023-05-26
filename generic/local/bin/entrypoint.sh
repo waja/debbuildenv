@@ -2,7 +2,7 @@
 
 if [ ! -f /.initialized ]; then
 	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list ] && sed -i "s#http://deb.debian.org/debian #${LOCAL_DEB_MIRROR}/debian #g" /etc/apt/sources.list;  \
-	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list.d/debian.sources ] && sed -i "s#http://deb.debian.org/debian#${LOCAL_DEB_MIRROR}/debian#g" /etc/apt/sources.list.d/debian.sources;  \
+	[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list.d/debian.sources ] && sed -i "s#http://deb.debian.org/debian\$#${LOCAL_DEB_MIRROR}/debian#g" /etc/apt/sources.list.d/debian.sources;  \
 	[ -n "${CACHE_HOST}" ] && echo "Acquire::http::Proxy \"http://${CACHE_HOST}:3142\";" > /etc/apt/apt.conf.d/01proxy; \
 	printf "APT::Install-Recommends \"false\";\nAptitude::Recommends-Important \"False\";" >	/etc/apt/apt.conf.d/00InstallRecommends && \
 	apt-get update > /dev/null && apt-get -y upgrade > /dev/null && \
