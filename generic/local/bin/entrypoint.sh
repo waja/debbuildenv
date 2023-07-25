@@ -16,9 +16,14 @@ EOF
 	apt-get update > /dev/null && apt-get install debian-cyconet-archive-keyring > /dev/null
 
 	case ${BUILD_TARGET} in
-		bullseye-backports)
+		bookworm-backports)
 			cat << EOF > /etc/apt/sources.list.d/testing.list
 deb-src http://ftp.de.debian.org/debian/ testing main contrib non-free
+EOF
+			;& #fallthru
+		bullseye-backports)
+			cat << EOF > /etc/apt/sources.list.d/bookworm.list
+deb-src http://ftp.de.debian.org/debian/ bookworm main contrib non-free
 EOF
 			;& #fallthru
 		*-backports)
