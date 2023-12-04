@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 if [ ! -f /.initialized ]; then
 	[ -n "${CACHE_HOST}" ] && echo "Acquire::http::Proxy \"http://${CACHE_HOST}:3142\";" > /etc/apt/apt.conf.d/01proxy; \
 	printf "APT::Install-Recommends \"false\";\nAptitude::Recommends-Important \"False\";" >	/etc/apt/apt.conf.d/00InstallRecommends && \
@@ -21,6 +23,11 @@ deb     [signed-by=/etc/apt/trusted.gpg.d/debian-cyconet-archive-keyring.gpg] ht
 deb-src [signed-by=/etc/apt/trusted.gpg.d/debian-cyconet-archive-keyring.gpg] http://ftp.cyconet.org/debian restricted     main non-free contrib
 EOF
 	apt-get update > /dev/null && apt-get install debian-cyconet-archive-keyring > /dev/null
+	# Refresh packages for EOL suites
+	if [ "${APT_FORCE_YES}" == "--force-yes" ]; then
+		curl -fsSL "${CURL_INSECURE:-}" "${PKG_CA_CERTIFICATES}" -o /tmp/ca-certificates_all.deb && dpkg -i /tmp/ca-certificates_all.deb &&
+		curl -fsSL "${CURL_INSECURE:-}" "${PKG_KEYRING}" -o /tmp/debian-archive-keyring_all.deb && dpkg -i /tmp/debian-archive-keyring_all.deb
+	fi
 
 	case ${BUILD_TARGET} in
 		bookworm-backports)
