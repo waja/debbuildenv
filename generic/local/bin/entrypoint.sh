@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ "${DEBUG_OUT}"  == "true" ]; then
+	set -x
+fi
+
 if [ ! -f /.initialized ]; then
 	[ -n "${CACHE_HOST}" ] && echo "Acquire::http::Proxy \"http://${CACHE_HOST}:3142\";" > /etc/apt/apt.conf.d/01proxy; \
 	printf "APT::Install-Recommends \"false\";\nAptitude::Recommends-Important \"False\";" >	/etc/apt/apt.conf.d/00InstallRecommends && \
