@@ -1,35 +1,36 @@
 #!/bin/bash
 
-usage(){
-      printf "***************************\n"
-      printf "* Error: Invalid argument.*\n"
-      printf "***************************\n"
-      exit 1
+usage() {
+	printf "***************************\n"
+	printf "* Error: Invalid argument.*\n"
+	printf "***************************\n"
+	exit 1
 }
 
 [ $# -eq 0 ] && usage
 
 while [ $# -gt 0 ]; do
-  case "$1" in
-    --mirror=*)
-      LOCAL_DEB_MIRROR="${1#*=}"
-      ;;
-    --target=*)
-      BUILD_TARGET="${1#*=}"
-      ;;
-    --entry-exit-command=*)
-      ENTRY_EXIT_COMMAND="${1#*=}"
-      ;;
-    --apt-cache-host=*)
-      CACHE_HOST="${1#*=}"
-      ;;
-    --build-user=*)
-      BUILD_USER="${1#*=}"
-      ;;
-    *)
-      usage
-  esac
-  shift
+	case "$1" in
+	--mirror=*)
+		LOCAL_DEB_MIRROR="${1#*=}"
+		;;
+	--target=*)
+		BUILD_TARGET="${1#*=}"
+		;;
+	--entry-exit-command=*)
+		ENTRY_EXIT_COMMAND="${1#*=}"
+		;;
+	--apt-cache-host=*)
+		CACHE_HOST="${1#*=}"
+		;;
+	--build-user=*)
+		BUILD_USER="${1#*=}"
+		;;
+	*)
+		usage
+		;;
+	esac
+	shift
 done
 
 LOCAL_DEB_MIRROR="${LOCAL_DEB_MIRROR:-http://deb.debian.org}"
@@ -41,10 +42,10 @@ CURL_CMD="${CURL_CMD:-curl -fsSL}"
 DEBUG_OUT="${DEBUG_OUT:-false}"
 PKG_CA_CERTIFICATES="${PKG_CA_CERTIFICATES:-http://archive.debian.org/debian/pool/main/c/ca-certificates/ca-certificates_20200601~deb9u1_all.deb}"
 PKG_KEYRING="${PKG_KEYRING:-http://deb.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2023.3+deb12u1_all.deb}"
-if [[ ( "${BUILD_USER}" != "root" ) || ( -z "${BUILD_USER}" ) ]]; then
-       USER_HOME_DIR="/home/${BUILD_USER}"
+if [[ ("${BUILD_USER}" != "root") || (-z "${BUILD_USER}") ]]; then
+	USER_HOME_DIR="/home/${BUILD_USER}"
 else
-       USER_HOME_DIR="/root"
+	USER_HOME_DIR="/root"
 fi
 
 SCRIPT_NAME="$(basename "${0}")"
@@ -52,34 +53,34 @@ BUILD_HOME="${BASE_DIR:-/srv}/${SCRIPT_NAME}/build/${BUILD_TARGET}"
 BUILD_DIR="${BUILD_HOME}/build"
 LOCAL_DIR="${BUILD_HOME}/local/bin"
 
-[[ ( ! ( -d ${LOCAL_DIR} ) || ! ( -L ${LOCAL_DIR} ) ) ]] && mkdir -p "${BUILD_HOME}/local" && ln -s "${BASE_DIR:-/srv}/${SCRIPT_NAME}/generic/local/bin" "${LOCAL_DIR}"
+[[ (! (-d ${LOCAL_DIR}) || ! (-L ${LOCAL_DIR})) ]] && mkdir -p "${BUILD_HOME}/local" && ln -s "${BASE_DIR:-/srv}/${SCRIPT_NAME}/generic/local/bin" "${LOCAL_DIR}"
 [ -f "${BUILD_DIR}" ] || mkdir -p "${BUILD_DIR}"
 
 DOCKER_RUN_OPTIONS="-i --rm"
 
 # Only allocate tty if we detect one
 if [ -t 0 ] && [ -t 1 ]; then
-    DOCKER_RUN_OPTIONS="${DOCKER_RUN_OPTIONS} -t"
+	DOCKER_RUN_OPTIONS="${DOCKER_RUN_OPTIONS} -t"
 fi
 
 # shellcheck disable=SC2086
-docker container attach "${BUILD_TARGET}" 2>/dev/null || \
- ( docker start "${BUILD_TARGET}" 2>/dev/null && docker container attach "${BUILD_TARGET}" ) || \
- docker run -h "${BUILD_TARGET}" --name "${BUILD_TARGET}" \
- -v "${BUILD_DIR}":"${USER_HOME_DIR}" \
- -v "${LOCAL_DIR}":"/usr/local/bin" \
- --workdir "${USER_HOME_DIR}" \
- -e "BUILD_TARGET=${BUILD_TARGET}" \
- -e "LOCAL_DEB_MIRROR=${LOCAL_DEB_MIRROR}" \
- -e "ENTRY_EXIT_COMMAND=${ENTRY_EXIT_COMMAND}" \
- -e "CACHE_HOST=${CACHE_HOST}" \
- -e "BUILD_USER=${BUILD_USER}" \
- -e "USER_HOME_DIR=${USER_HOME_DIR}" \
- -e "PKG_CA_CERTIFICATES=${PKG_CA_CERTIFICATES}" \
- -e "PKG_KEYRING=${PKG_KEYRING}" \
- -e "APT_INSTALL_CMD=${APT_INSTALL_CMD}" \
- -e "CURL_CMD=${CURL_CMD}" \
- -e "DEBUG_OUT=${DEBUG_OUT}" \
- ${DOCKER_RUN_OPTIONS} \
- debian:"${BUILD_TARGET}" \
- "entrypoint.sh"
+docker container attach "${BUILD_TARGET}" 2>/dev/null ||
+	(docker start "${BUILD_TARGET}" 2>/dev/null && docker container attach "${BUILD_TARGET}") ||
+	docker run -h "${BUILD_TARGET}" --name "${BUILD_TARGET}" \
+		-v "${BUILD_DIR}":"${USER_HOME_DIR}" \
+		-v "${LOCAL_DIR}":"/usr/local/bin" \
+		--workdir "${USER_HOME_DIR}" \
+		-e "BUILD_TARGET=${BUILD_TARGET}" \
+		-e "LOCAL_DEB_MIRROR=${LOCAL_DEB_MIRROR}" \
+		-e "ENTRY_EXIT_COMMAND=${ENTRY_EXIT_COMMAND}" \
+		-e "CACHE_HOST=${CACHE_HOST}" \
+		-e "BUILD_USER=${BUILD_USER}" \
+		-e "USER_HOME_DIR=${USER_HOME_DIR}" \
+		-e "PKG_CA_CERTIFICATES=${PKG_CA_CERTIFICATES}" \
+		-e "PKG_KEYRING=${PKG_KEYRING}" \
+		-e "APT_INSTALL_CMD=${APT_INSTALL_CMD}" \
+		-e "CURL_CMD=${CURL_CMD}" \
+		-e "DEBUG_OUT=${DEBUG_OUT}" \
+		${DOCKER_RUN_OPTIONS} \
+		debian:"${BUILD_TARGET}" \
+		"entrypoint.sh"
