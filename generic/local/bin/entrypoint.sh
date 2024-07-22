@@ -54,7 +54,7 @@ EOF
 		unstable|sid)
 			sed "s/ deb/ deb-src/g" /etc/apt/sources.list.d/debian.sources > /etc/apt/sources.list.d/debian-src.sources && \
 			apt-get update > /dev/null && \
-			${APT_INSTALL_CMD} git-buildpackage bash-completion > /dev/null
+			${APT_INSTALL_CMD} git-buildpackage bash-completion fakeroot > /dev/null
 			;;
 		*)
 			;;
