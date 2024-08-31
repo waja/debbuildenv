@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     branches:
-      - '*'
+      - "*"
   pull_request:
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
           # list of files that changed across commits
           fetch-depth: 0
       - name: Lint Code Base
-        uses: github/super-linter@v6
+        uses: github/super-linter@v7
         env:
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,10 +76,34 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {"target": "unstable", "mirror": "http://http.debian.net", "user": "user1", "command": "bash", "cacher": "apt-cacher-ng"}
-          - {"target": "testing-backports", "mirror": "http://deb.debian.net", "user": "user4", "command": "dash", "cacher": ""}
-          - {"target": "bullseye-backports", "mirror": "http://deb.debian.net", "user": "root", "command": "sh", "cacher": "apt-cacher-ng"}
-          - {"target": "buster-backports", "mirror": "http://deb.debian.net", "user": "foobar", "command": "bash", "cacher": "apt-cacher-ng"}
+          - {
+              "target": "unstable",
+              "mirror": "http://http.debian.net",
+              "user": "user1",
+              "command": "bash",
+              "cacher": "apt-cacher-ng",
+            }
+          - {
+              "target": "testing-backports",
+              "mirror": "http://deb.debian.net",
+              "user": "user4",
+              "command": "dash",
+              "cacher": "",
+            }
+          - {
+              "target": "bullseye-backports",
+              "mirror": "http://deb.debian.net",
+              "user": "root",
+              "command": "sh",
+              "cacher": "apt-cacher-ng",
+            }
+          - {
+              "target": "buster-backports",
+              "mirror": "http://deb.debian.net",
+              "user": "foobar",
+              "command": "bash",
+              "cacher": "apt-cacher-ng",
+            }
     steps:
       - name: Git clone repository
         uses: actions/checkout@v4
