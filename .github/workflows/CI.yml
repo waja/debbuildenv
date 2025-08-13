@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "*"
+      - $default-branch
+      - development
+      - master
   # Run tests for any PRs
   pull_request:
   schedule:
