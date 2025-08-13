@@ -1,10 +1,14 @@
 name: Test
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "*"
+  # Run tests for any PRs
   pull_request:
+  schedule:
+    - cron: "43 10 * * 4"
 
 jobs:
   codespell:
