@@ -101,6 +101,20 @@ jobs:
               "cacher": "",
             }
           - {
+              "target": "trixie-backports",
+              "mirror": "http://deb.debian.net",
+              "user": "root",
+              "command": "sh",
+              "cacher": "apt-cacher-ng",
+            }
+          - {
+              "target": "bookworm-backports",
+              "mirror": "http://deb.debian.net",
+              "user": "root",
+              "command": "sh",
+              "cacher": "apt-cacher-ng",
+            }
+          - {
               "target": "bullseye-backports",
               "mirror": "http://deb.debian.net",
               "user": "root",
