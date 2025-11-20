@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Codespell
         uses: codespell-project/actions-codespell@v2.2
         with:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           # super-linter needs the full git history to get the
           # list of files that changed across commits
@@ -54,7 +54,7 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Perform ShiftLeft Scan
         uses: ShiftLeftSecurity/scan-action@v1.3.0
         env:
@@ -130,7 +130,7 @@ jobs:
             }
     steps:
       - name: Git clone repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Run the tests on "${{ matrix.target }}"
         env:
           BASE_DIR: "/tmp"
