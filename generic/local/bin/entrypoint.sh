@@ -9,7 +9,7 @@ if [ ! -f /.initialized ]; then
 	printf "APT::Install-Recommends \"false\";\nAptitude::Recommends-Important \"False\";" >/etc/apt/apt.conf.d/00InstallRecommends &&
 		[ -n "${LOCAL_DEB_MIRROR}" ] && [ -f /etc/apt/sources.list ] &&
 		if [ "${LOCAL_DEB_MIRROR}" == "http://archive.debian.org" ]; then
-			sed -i "s#http://deb.debian.org/debian #[check-valid-until=no] ${LOCAL_DEB_MIRROR}/debian #g" /etc/apt/sources.list && sed -i '/security.debian.org/d' /etc/apt/sources.list && sed -i '/-updates/d' /etc/apt/sources.list
+			sed -i "s#http://deb.debian.org/debian #[check-valid-until=no] ${LOCAL_DEB_MIRROR}/debian #g" /etc/apt/sources.list && sed -i '/security.debian.org/d' /etc/apt/sources.list && sed -i '/-updates/d' /etc/apt/sources.list && sed -i '/-security/d' /etc/apt/sources.list
 			APT_INSTALL_CMD+=" --force-yes"
 			CURL_CMD+=" -k"
 			ARCHIVED="true"
