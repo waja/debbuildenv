@@ -41,7 +41,7 @@ APT_INSTALL_CMD="${APT_INSTALL_CMD:-apt-get install -y --no-install-recommends}"
 CURL_CMD="${CURL_CMD:-curl -fsSL}"
 DEBUG_OUT="${DEBUG_OUT:-false}"
 PKG_CA_CERTIFICATES="${PKG_CA_CERTIFICATES:-http://archive.debian.org/debian/pool/main/c/ca-certificates/ca-certificates_20200601~deb9u1_all.deb}"
-PKG_KEYRING="${PKG_KEYRING:-http://deb.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2023.3+deb12u1_all.deb}"
+PKG_KEYRING="${PKG_KEYRING:-http://deb.debian.org/debian/pool/main/d/debian-archive-keyring/debian-archive-keyring_2023.3+deb12u2_all.deb}"
 if [[ ("${BUILD_USER}" != "root") || (-z "${BUILD_USER}") ]]; then
 	USER_HOME_DIR="/home/${BUILD_USER}"
 else
